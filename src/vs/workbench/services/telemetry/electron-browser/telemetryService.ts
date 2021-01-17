@@ -3,6 +3,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
+import { process } from 'vs/base/parts/sandbox/electron-sandbox/globals';
 import { ITelemetryService, ITelemetryInfo, ITelemetryData } from 'vs/platform/telemetry/common/telemetry';
 import { NullTelemetryService } from 'vs/platform/telemetry/common/telemetryUtils';
 import { IConfigurationService } from 'vs/platform/configuration/common/configuration';
@@ -39,7 +40,7 @@ export class TelemetryService extends Disposable implements ITelemetryService {
 			const channel = sharedProcessService.getChannel('telemetryAppender');
 			const config: ITelemetryServiceConfig = {
 				appender: new TelemetryAppenderClient(channel),
-				commonProperties: resolveWorkbenchCommonProperties(storageService, fileService, environmentService.os.release, productService.commit, productService.version, environmentService.machineId, productService.msftInternalDomains, environmentService.installSourcePath, environmentService.remoteAuthority),
+				commonProperties: resolveWorkbenchCommonProperties(storageService, fileService, environmentService.os.release, process.arch, productService.commit, productService.version, environmentService.machineId, productService.msftInternalDomains, environmentService.installSourcePath, environmentService.remoteAuthority),
 				piiPaths: [environmentService.appRoot, environmentService.extensionsPath],
 				sendErrorTelemetry: true
 			};

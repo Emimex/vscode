@@ -4,13 +4,15 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { IFileService } from 'vs/platform/files/common/files';
-import * as Platform from 'vs/base/common/platform';
-import * as uuid from 'vs/base/common/uuid';
+import { isLinuxSnap, PlatformToString, platform } from 'vs/base/common/platform';
+import { platform as nodePlatform, env } from 'vs/base/common/process';
+import { generateUuid } from 'vs/base/common/uuid';
 import { URI } from 'vs/base/common/uri';
 
 export async function resolveCommonProperties(
 	fileService: IFileService,
 	release: string,
+	arch: string,
 	commit: string | undefined,
 	version: string | undefined,
 	machineId: string | undefined,
@@ -23,7 +25,7 @@ export async function resolveCommonProperties(
 	// __GDPR__COMMON__ "common.machineId" : { "endPoint": "MacAddressHash", "classification": "EndUserPseudonymizedInformation", "purpose": "FeatureInsight" }
 	result['common.machineId'] = machineId;
 	// __GDPR__COMMON__ "sessionID" : { "classification": "SystemMetaData", "purpose": "FeatureInsight" }
-	result['sessionID'] = uuid.generateUuid() + Date.now();
+	result['sessionID'] = generateUuid() + Date.now();
 	// __GDPR__COMMON__ "commitHash" : { "classification": "SystemMetaData", "purpose": "PerformanceAndHealth" }
 	result['commitHash'] = commit;
 	// __GDPR__COMMON__ "version" : { "classification": "SystemMetaData", "purpose": "FeatureInsight" }
@@ -31,11 +33,11 @@ export async function resolveCommonProperties(
 	// __GDPR__COMMON__ "common.platformVersion" : { "classification": "SystemMetaData", "purpose": "FeatureInsight" }
 	result['common.platformVersion'] = (release || '').replace(/^(\d+)(\.\d+)?(\.\d+)?(.*)/, '$1$2$3');
 	// __GDPR__COMMON__ "common.platform" : { "classification": "SystemMetaData", "purpose": "FeatureInsight" }
-	result['common.platform'] = Platform.PlatformToString(Platform.platform);
+	result['common.platform'] = PlatformToString(platform);
 	// __GDPR__COMMON__ "common.nodePlatform" : { "classification": "SystemMetaData", "purpose": "PerformanceAndHealth" }
-	result['common.nodePlatform'] = process.platform;
+	result['common.nodePlatform'] = nodePlatform;
 	// __GDPR__COMMON__ "common.nodeArch" : { "classification": "SystemMetaData", "purpose": "PerformanceAndHealth" }
-	result['common.nodeArch'] = process.arch;
+	result['common.nodeArch'] = arch;
 	// __GDPR__COMMON__ "common.product" : { "classification": "SystemMetaData", "purpose": "PerformanceAndHealth" }
 	result['common.product'] = product || 'desktop';
 
@@ -66,7 +68,7 @@ export async function resolveCommonProperties(
 		}
 	});
 
-	if (Platform.isLinuxSnap) {
+	if (isLinuxSnap) {
 		// __GDPR__COMMON__ "common.snap" : { "classification": "SystemMetaData", "purpose": "FeatureInsight" }
 		result['common.snap'] = 'true';
 	}
@@ -84,10 +86,11 @@ export async function resolveCommonProperties(
 }
 
 function verifyMicrosoftInternalDomain(domainList: readonly string[]): boolean {
-	if (!process || !process.env || !process.env['USERDNSDOMAIN']) {
+	const userDnsDomain = env['USERDNSDOMAIN'];
+	if (!userDnsDomain) {
 		return false;
 	}
 
-	const domain = process.env['USERDNSDOMAIN']!.toLowerCase();
+	const domain = userDnsDomain.toLowerCase();
 	return domainList.some(msftDomain => domain === msftDomain);
 }

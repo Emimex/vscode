@@ -14,6 +14,7 @@ export async function resolveWorkbenchCommonProperties(
 	storageService: IStorageService,
 	fileService: IFileService,
 	release: string,
+	arch: string,
 	commit: string | undefined,
 	version: string | undefined,
 	machineId: string,
@@ -21,7 +22,7 @@ export async function resolveWorkbenchCommonProperties(
 	installSourcePath: string,
 	remoteAuthority?: string
 ): Promise<{ [name: string]: string | boolean | undefined }> {
-	const result = await resolveCommonProperties(fileService, release, commit, version, machineId, msftInternalDomains, installSourcePath, undefined);
+	const result = await resolveCommonProperties(fileService, release, arch, commit, version, machineId, msftInternalDomains, installSourcePath, undefined);
 	const instanceId = storageService.get(instanceStorageKey, StorageScope.GLOBAL)!;
 	const firstSessionDate = storageService.get(firstSessionDateStorageKey, StorageScope.GLOBAL)!;
 	const lastSessionDate = storageService.get(lastSessionDateStorageKey, StorageScope.GLOBAL)!;

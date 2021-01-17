@@ -537,7 +537,7 @@ export class CodeApplication extends Disposable {
 		if (!this.environmentService.isExtensionDevelopment && !this.environmentService.args['disable-telemetry'] && !!product.enableTelemetry) {
 			const channel = getDelayedChannel(sharedProcessReady.then(client => client.getChannel('telemetryAppender')));
 			const appender = new TelemetryAppenderClient(channel);
-			const commonProperties = resolveCommonProperties(this.fileService, release(), product.commit, product.version, machineId, product.msftInternalDomains, this.environmentService.installSourcePath);
+			const commonProperties = resolveCommonProperties(this.fileService, release(), process.arch, product.commit, product.version, machineId, product.msftInternalDomains, this.environmentService.installSourcePath);
 			const piiPaths = [this.environmentService.appRoot, this.environmentService.extensionsPath];
 			const config: ITelemetryServiceConfig = { appender, commonProperties, piiPaths, sendErrorTelemetry: true };
 

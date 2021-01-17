@@ -214,7 +214,7 @@ class SharedProcessMain extends Disposable {
 
 			telemetryService = new TelemetryService({
 				appender: telemetryAppender,
-				commonProperties: resolveCommonProperties(fileService, release(), product.commit, product.version, this.configuration.machineId, product.msftInternalDomains, installSourcePath),
+				commonProperties: resolveCommonProperties(fileService, release(), process.arch, product.commit, product.version, this.configuration.machineId, product.msftInternalDomains, installSourcePath),
 				sendErrorTelemetry: true,
 				piiPaths: [appRoot, extensionsPath]
 			}, configurationService);
